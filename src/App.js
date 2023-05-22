@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
+import VideoThumbnail from './components/VideoThumbnail';
+import VideoPlayer from './components/VideoPlayer';
 
-function App() {
+const App = () => {
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+  useEffect(() => {
+    fetchVideos(5); // Fetch initial videos
+  }, []);
+
+  const fetchVideos = async (page) => {
+    const {data} = await axios.get(`https://internship-service.onrender.com/videos?page=${page}`);
+    console.log(data);
+    const videos = data.data.posts;
+    setVideos(videos);
+    console.log(videos);
+  };
+
+  const handleThumbnailClick = (video) => {
+    setSelectedVideo(video);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <div className="videos">
+        {videos.map((video, index) => (
+          <VideoThumbnail key={video.postId} video={video} onClick={handleThumbnailClick} />
+        ))}
+      </div>
+      <div className="video-container">
+        {selectedVideo ? <VideoPlayer video={selectedVideo} /> : <p>No video selected.</p>}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
